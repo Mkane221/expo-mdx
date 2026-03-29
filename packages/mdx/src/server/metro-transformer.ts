@@ -3,6 +3,7 @@ import {
   rehypeExpoLocalImages,
   type RehypeExpoLocalImagesOptions,
 } from "./plugins/rehype-expo-local-images";
+import { rehypeInlineCode } from "./plugins/rehype-inline-code";
 import { rehypePrefixTagNames } from "./plugins/rehype-prefix-tag-names";
 import { rehypeStripTableWhitespace } from "./plugins/rehype-strip-table-whitespace";
 
@@ -52,6 +53,7 @@ export function createTransformer({
   matchLocalAsset,
   matchFile = (props) => !!props.filename.match(/\.mdx?$/),
   remarkPlugins = [],
+  rehypePlugins: extraRehypePlugins = [],
 }: RehypeExpoLocalImagesOptions & {
   /**
    * @param props Metro transform props.
@@ -61,6 +63,9 @@ export function createTransformer({
   matchFile?: (props: { filename: string; src: string }) => boolean;
 
   remarkPlugins?: any[];
+
+  /** Additional rehype plugins to run before the built-in prefix/table plugins. */
+  rehypePlugins?: any[];
 } = {}) {
   // Generate a unique key for this transformer configuration
   const compilerKey = `transformer-${++_transformerCounter}`;
@@ -77,6 +82,8 @@ export function createTransformer({
         rehypePlugins: [
           [rehypeExpoLocalImages, { matchLocalAsset }],
           rehypeStripTableWhitespace,
+          rehypeInlineCode,
+          ...extraRehypePlugins,
           [rehypePrefixTagNames, { prefix: "html." }],
         ],
         recmaPlugins: [[recmaExpoRuntime, { visit: estreeVisit }]],
