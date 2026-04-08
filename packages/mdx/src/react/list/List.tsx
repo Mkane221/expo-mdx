@@ -1,28 +1,15 @@
-import { Text, View, ViewProps, TextProps } from "@bacons/react-views";
-import React, { ComponentType, PropsWithChildren } from "react";
-import { Platform } from "react-native";
+import { View } from 'react-native';
 
-function createView(nativeProps: ViewProps = {}): ComponentType<ViewProps> {
-  return function IView(props: ViewProps) {
-    return <View {...nativeProps} {...props} />;
-  };
-}
+const List = ({ items }) => {
+    return (
+        <View>
+            {items.map((item, index) => (
+                <View key={index} style={{ padding: 10, borderBottomWidth: 1, borderColor: '#ccc' }}>
+                    <Text>{item}</Text>
+                </View>
+            ))}
+        </View>
+    );
+};
 
-export const UL = createView(
-  Platform.select({
-    web: {
-      role: "list",
-    },
-  })
-);
-
-type LIProps = TextProps | ViewProps;
-
-export function LI(props: PropsWithChildren<LIProps>) {
-  const accessibilityRole = Platform.select({
-    web: "listitem",
-    default: props.accessibilityRole ?? props.role,
-  });
-  // @ts-expect-error
-  return <Text {...props} role={accessibilityRole} />;
-}
+export default List;
